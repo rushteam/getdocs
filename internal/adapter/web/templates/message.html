@@ -1,0 +1,16 @@
+{{define "content"}}
+<main class="container message">
+  <h1>{{.Heading}}</h1>
+  <p class="muted">{{.Text}}</p>
+  {{with .Tree}}
+  <dl class="kv">
+    <dt>来源</dt><dd class="mono break">{{.Source}}</dd>
+    <dt>状态</dt><dd>{{if .Running}}<span class="badge badge-info">同步中</span>{{else if eq .LastStatus "failed"}}<span class="badge badge-err">失败</span>{{else}}未同步{{end}}</dd>
+    {{if .LastError}}<dt>错误</dt><dd><pre class="error-text">{{.LastError}}</pre></dd>{{end}}
+  </dl>
+  <p><a class="btn" href="/status/{{.Namespace}}/{{.Name}}">查看同步状态</a></p>
+  {{else}}
+  <p><a class="btn" href="/">返回首页</a></p>
+  {{end}}
+</main>
+{{end}}

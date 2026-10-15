@@ -1,0 +1,155 @@
+# GetDocs 配置示例。复制为 getdocs.yaml 后按需修改：
+#   cp config.example.yaml getdocs.yaml && getdocs serve
+#
+# 任意字符串值都支持环境变量展开：${VAR} 或 ${VAR:-默认值}。
+# 相对路径以本配置文件所在目录为基准；也支持 ~/ 开头。
+
+server:
+  addr: ":8080"                 # 监听地址
+  title: GetDocs                # 站点标题
+  base_url: ${GETDOCS_BASE_URL:-http://localhost:8080}  # 对外地址，用于 API / MCP 返回的链接
+  # 保护同步、webhook 等写接口：Authorization: Bearer <token>。为空时写接口不鉴权，仅建议内网使用。
+  admin_token: ${GETDOCS_ADMIN_TOKEN:-}
+  # 校验 git 平台推送事件（GitHub/Gitea 的 HMAC 签名、GitLab 的 X-Gitlab-Token、Gitee 的密码或签名）；为空时退回 admin_token。
+  webhook_secret: ${GETDOCS_WEBHOOK_SECRET:-}
+  # 调试端口：/debug/pprof/、/debug/loglevel（GET 查看、PUT {"level":"debug"} 调整）、/debug/version。
+  # 不鉴权，务必只监听本机；留空不开启。
+  # debug_addr: 127.0.0.1:6060
+
+# OpenTelemetry：开启后通过 OTLP/HTTP 上报 trace 与指标（含 Go runtime 指标），日志自动带 trace_id。
+# 上报地址等用标准环境变量配置，如 OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318。
+telemetry:
+  enabled: false
+
+storage:
+  dir: ./data                   # 快照、同步状态、git 工作副本缓存
+  keep_versions: 5              # 每棵文档树保留的历史快照数（用于回看与切片增量 ?since=）
+
+sync:
+  interval: 15m                 # 默认定时同步间隔（最小 10s），可被文档树覆盖；关闭定时同步用 auto_sync: false
+  on_start: true                # 启动时同步一次
+  timeout: 10m                  # 单次同步超时
+  git_timeout: 5m               # 单条 git 命令超时
+  concurrency: 4                # 批量同步并发度
+
+search:
+  enabled: true                 # 内置全文检索（BM25，中文按二元组切分）
+
+mcp:
+  enabled: true                 # 在 /mcp 提供 MCP（Streamable HTTP）
+  token: ${GETDOCS_MCP_TOKEN:-} # 为空时不鉴权
+  allow_sync: false             # 是否提供 sync_tree 工具，允许 agent 触发同步
+
+# 同步扩展：每次同步产生新版本后调用，用于接入 RAG / 向量库等下游。
+hooks:
+  chunk_size: 1500              # 切片最大字符数
+  # 把切片增量写入 <dir>/<namespace>/<tree>/<version>.json
+  # chunk_export:
+  #   dir: ./export
+  # 把同步事件 POST 到外部服务；配置 secret 时附带 X-Getdocs-Signature: sha256=<hmac>
+  # webhooks:
+  #   - url: https://rag.example.com/hooks/getdocs
+  #     secret: ${RAG_WEBHOOK_SECRET}
+  #     with_chunks: true       # 附带切片增量（upsert / delete）
+
+# 命名空间 → 文档树 → 文档。一个命名空间下可以有多棵来自不同仓库的文档树。
+#
+# 新增仓库 = 在某个命名空间的 trees 下加一项 repo，重启服务生效。
+# repo 支持 https 与 ssh 地址，可以是 GitHub、GitLab、Gitee、Gitea / Codeberg、Bitbucket 或任意 git 服务：
+#   provider   托管平台，留空按域名识别（域名含 github / gitlab / gitee / gitea / codeberg / bitbucket）；
+#              自建平台域名不含平台名时手动指定，用于推导“查看源文件”链接和令牌认证的默认用户名
+#   auth.token HTTPS 访问令牌；auth.username 留空时按平台取默认值：
+#                GitHub    x-access-token（Personal access token，需 Contents: Read）
+#                GitLab    oauth2（Personal / Project access token，需 read_repository）
+#                Gitea     oauth2（Access token，需 repository: Read）
+#                Bitbucket x-token-auth（Repository access token；App password 需填真实用户名）
+#                Gitee     无默认值，必须填写 Gitee 用户名（私人令牌，需 projects 权限）
+#   auth.ssh_key  SSH 私钥路径，与 token 二选一；公开仓库都不用填
+#
+# 也可以在 /status 页面点击“添加文档树”登记仓库（需配置 server.admin_token），
+# 登记结果保存在 <storage.dir>/registry.json，与下面的配置合并；重名时以配置文件为准。
+
+# 具名凭据：页面登记私有仓库时按名称选择，令牌不经过浏览器。字段同 trees[].auth。
+credentials: []
+#  - name: github-bot
+#    token: ${GITHUB_TOKEN}
+#  - name: gitee-bot
+#    username: your-gitee-username
+#    token: ${GITEE_TOKEN}
+
+registry:
+  enabled: true                 # 允许页面登记（仍需 admin_token）
+  # 允许登记的 git 主机；为空时允许任意公网主机，内网 / 本机地址需在此显式列出
+  allowed_hosts: []
+  #  - gitlab.internal.example.com
+
+namespaces:
+  - name: platform              # URL 标识：字母、数字、_ . -
+    title: 平台服务
+    description: 后端平台各服务的接口与运维文档
+    trees:
+      # 1) GitHub，自动探测文档根：依次尝试 docs/ doc/ documentation/ wiki/ website/docs ...，都没有则扫描整个仓库
+      - name: gateway
+        title: API 网关
+        repo: https://github.com/example/gateway.git
+        branch: main            # 留空跟踪远端默认分支
+        exclude:                # 相对文档根的 glob（支持 **）；依赖、隐藏目录与构建产物默认排除
+          - "drafts/**"
+          - "**/internal-*.md"
+        interval: 5m
+        auth:
+          token: ${GITHUB_TOKEN:-}   # HTTPS 令牌，通过环境变量传给 git，不写入 .git/config
+
+      # 2) 自建 GitLab + SSH，指定目录作为文档根，并只收录部分文件
+      - name: billing
+        title: 计费服务
+        repo: git@gitlab.example.com:platform/billing.git
+        root: docs/user-guide
+        include: ["**/*.md"]    # 设置后只收录匹配的文档
+        max_file_size: 2097152  # 单个文档大小上限（字节），默认 4MiB
+        auth:
+          ssh_key: ~/.ssh/id_ed25519_docs
+        # 自建平台无法推导“查看源文件”链接时手动指定，可用 {branch} {commit} {path}
+        browse_url: https://gitlab.example.com/platform/billing/-/blob/{commit}/{path}
+
+      # 3) Gitee：令牌认证必须填写用户名
+      - name: order
+        title: 订单服务
+        repo: https://gitee.com/example/order.git
+        root: docs
+        auth:
+          username: ${GITEE_USER:-}
+          token: ${GITEE_TOKEN:-}
+
+      # 4) protobuf 接口文档：每个 .proto 文件生成一页，列出服务、方法（含 google.api.http 映射）、消息字段与枚举
+      - name: user-api
+        title: 用户服务接口
+        repo: https://github.com/example/apis.git
+        root: proto
+        proto: true             # 同时收录 .proto 文件；默认只收录 markdown
+        exclude: ["third_party"] # 引入的第三方 proto 通常不需要展示
+
+  - name: tools
+    title: 工具
+    trees:
+      # 5) Gitea，指定单个文件作为文档树（如仓库只有一个 README）
+      - name: cli
+        title: 命令行工具
+        repo: https://gitea.example.com/tools/cli.git
+        root: README.md
+        auto_sync: false        # 关闭定时同步，仅手动 / webhook 触发
+
+      # 6) 域名看不出平台的自建服务：用 provider 指定
+      - name: deploy
+        title: 部署脚本
+        repo: https://code.example.com/ops/deploy.git
+        provider: gitlab        # github | gitlab | gitee | gitea | bitbucket
+        auth:
+          token: ${CODE_TOKEN:-}
+
+      # 7) 本地目录：用于本地预览或挂载进容器的文档，不经过 git 拉取
+      - name: getdocs
+        title: GetDocs
+        path: .
+        root: README.md
+        interval: 1m

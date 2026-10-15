@@ -1,0 +1,79 @@
+// 用户服务接口定义。
+//
+// 提供用户的增删改查。
+syntax = "proto3";
+
+package acme.user.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "api/common/v1/page.proto";
+
+option go_package = "github.com/acme/api/user/v1;userv1";
+option java_multiple_files = true;
+
+// UserService 管理用户。
+service UserService {
+  // 获取单个用户。
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/v1/users/{id}"
+    };
+  }
+  // 创建用户。
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/v1/users"
+      body: "user"
+      additional_bindings { post: "/v1/orgs/{org}/users" body: "*" }
+    };
+  }
+  // 订阅用户变更事件。
+  rpc WatchUsers(WatchUsersRequest) returns (stream UserEvent);
+  rpc Chat(stream ChatMessage) returns (stream ChatMessage) {
+    option deprecated = true;
+  }
+}
+
+// 用户。
+message User {
+  string id = 1; // 用户 ID
+  // 显示名称，最长 64 个字符。
+  string name = 2;
+  Status status = 3;
+  repeated string tags = 4;
+  map<string, string> labels = 5; // 自定义标签
+  google.protobuf.Timestamp create_time = 6;
+  optional string email = 7;
+  oneof contact {
+    string phone = 8;
+    Address address = 9;
+  }
+  string legacy = 10 [deprecated = true];
+
+  // 地址 | 含竖线。
+  message Address {
+    string city = 1;
+    Kind kind = 2;
+    enum Kind {
+      KIND_UNSPECIFIED = 0;
+      HOME = 1;
+    }
+  }
+}
+
+// 用户状态。
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1; // 正常
+  DISABLED = 2 [deprecated = true];
+}
+
+message GetUserRequest { string id = 1; }
+message CreateUserRequest {
+  User user = 1;
+  acme.common.v1.PageToken page = 2;
+}
+message WatchUsersRequest {}
+message UserEvent { User user = 1; }
+message ChatMessage { string text = 1; }

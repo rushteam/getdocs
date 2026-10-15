@@ -1,0 +1,45 @@
+{{define "content"}}
+<main class="container">
+  <h1>搜索</h1>
+  {{if not .Enabled}}
+  <p class="muted">全文检索未启用。</p>
+  {{else}}
+  <form class="search-form" action="/search" method="get">
+    <input class="control" type="search" name="q" value="{{.Query}}" placeholder="输入关键词" autocomplete="off" autofocus>
+    {{- $scope := ""}}{{$label := "全部文档"}}
+    {{- range .Scopes}}{{if eq .URL $.Scope}}{{$scope = .URL}}{{$label = .Title}}{{end}}{{end}}
+    <div class="select" data-select>
+      <input type="hidden" name="scope" value="{{$scope}}">
+      <button class="control select-trigger" type="button" role="combobox" aria-label="搜索范围" aria-haspopup="listbox" aria-expanded="false">
+        <span>{{$label}}</span>
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <ul class="select-list" role="listbox" aria-label="搜索范围" hidden>
+        <li role="option" data-value="" aria-selected="{{eq $scope ""}}">全部文档</li>
+        {{- range .Scopes}}
+        <li role="option" data-value="{{.URL}}" aria-selected="{{eq .URL $scope}}">{{.Title}}</li>
+        {{- end}}
+      </ul>
+    </div>
+    <button type="submit" class="btn">搜索</button>
+  </form>
+  {{if .Error}}<p class="badge badge-err">{{.Error}}</p>{{end}}
+  {{if .Query}}
+    {{if .Hits}}
+    <p class="muted">找到 {{len .Hits}} 条结果</p>
+    <ol class="hits">
+      {{range .Hits}}
+      <li>
+        <a class="hit-title" href="{{.URL}}">{{.Title}}{{if and .Heading (ne .Heading .Title)}} <span class="muted">› {{.Heading}}</span>{{end}}</a>
+        <div class="hit-path muted">{{.Key.Namespace}} / {{.TreeTitle}} · <span class="mono">{{.Path}}</span></div>
+        <p class="hit-snippet">{{.Snippet}}</p>
+      </li>
+      {{end}}
+    </ol>
+    {{else}}
+    <p class="muted">没有找到与“{{.Query}}”相关的内容。</p>
+    {{end}}
+  {{end}}
+  {{end}}
+</main>
+{{end}}

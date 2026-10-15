@@ -1,0 +1,116 @@
+{{define "content"}}
+<main class="container">
+  <div class="page-head">
+    <h1>同步状态</h1>
+    <div class="actions">
+    {{if .CanRegister}}<button class="btn btn-secondary" type="button" data-open="add-tree">添加文档树</button>{{end}}
+    <button class="btn" type="button" data-sync-all data-confirm="将依次拉取并同步全部文档树，仓库较多时会占用一段时间。"{{if .AuthNeeded}} data-auth{{end}}>全部同步</button>
+    </div>
+  </div>
+  {{range .Namespaces}}
+  <section class="namespace">
+    <h2>{{.Title}}</h2>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>文档树</th><th>来源</th><th>文档</th><th>提交</th><th>最近同步</th><th>状态</th><th></th></tr></thead>
+      <tbody>
+      {{range .Trees}}
+      <tr>
+        <td><a href="/status/{{.Namespace}}/{{.Name}}">{{.Title}}</a><div class="muted small mono">{{.Namespace}}/{{.Name}}</div></td>
+        <td class="small">{{with .Provider}}<span class="badge">{{providerTitle .}}</span> {{end}}<span class="mono break">{{.Source}}</span>{{if .Branch}}<div class="muted">分支 {{.Branch}}{{if .Root}} · 根 {{.Root}}{{end}}</div>{{end}}</td>
+        <td>{{if .Synced}}<a href="{{.URL}}">{{.Docs}}</a>{{else}}-{{end}}</td>
+        <td class="mono">{{if .Commit}}{{short .Commit}}{{else}}-{{end}}</td>
+        <td title="{{datetime .LastSyncAt}}">{{ago .LastSyncAt}}{{if .Interval}}<div class="muted small">每 {{.Interval}}</div>{{end}}</td>
+        <td>
+          {{if .Running}}<span class="badge badge-info">同步中</span>
+          {{else if eq .LastStatus "failed"}}<span class="badge badge-err" title="{{.LastError}}">失败</span>
+          {{else if .LastStatus}}<span class="badge badge-ok">{{.LastStatus}}</span>
+          {{else}}<span class="badge">未同步</span>{{end}}
+        </td>
+        <td><button class="btn btn-secondary btn-sm" type="button" data-sync="{{.Namespace}}/{{.Name}}"{{if $.AuthNeeded}} data-auth{{end}}>同步</button></td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+    </div>
+  </section>
+  {{end}}
+  {{if .CanRegister}}
+  <p class="muted small">点击“添加文档树”登记 git 仓库，支持 GitHub、GitLab、Gitee、Gitea、Bitbucket 及任意 git 服务，保存后立即同步。私有仓库的令牌在配置文件 <code>credentials</code> 中定义，这里按名称选择。</p>
+  {{else}}
+  <p class="muted small">新增仓库：在配置文件（默认 <code>getdocs.yaml</code>）的 <code>namespaces[].trees[]</code> 下添加一项 <code>repo</code>，重启服务后生效。配置 <code>server.admin_token</code> 后可直接在本页添加。</p>
+  {{end}}
+  {{if .CanRegister}}
+  <dialog class="modal modal-wide" id="add-tree" aria-labelledby="add-tree-title">
+    <form class="modal-inner" data-add-tree novalidate>
+      <div class="modal-head">
+        <h2 class="modal-title" id="add-tree-title">添加文档树</h2>
+        <button class="icon-btn" type="button" data-close aria-label="关闭"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="form-grid">
+        <div class="field span-2">
+          <label for="f-repo">仓库地址</label>
+          <input class="control" id="f-repo" name="repo" placeholder="https://github.com/org/repo.git 或 git@gitee.com:org/repo.git" autocomplete="off" spellcheck="false" required>
+          <p class="field-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-ns">命名空间</label>
+          <input class="control" id="f-ns" name="namespace" placeholder="{{range $i, $n := .Namespaces}}{{if not $i}}{{$n.Name}}{{end}}{{end}}" autocomplete="off" spellcheck="false" required>
+          <p class="field-hint">已有：{{range $i, $n := .Namespaces}}{{if $i}}、{{end}}{{$n.Name}}{{else}}无{{end}}；填写新名称会自动创建</p>
+          <p class="field-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-name">名称</label>
+          <input class="control" id="f-name" name="name" placeholder="用于 URL，如 api-docs" autocomplete="off" spellcheck="false" required>
+          <p class="field-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="f-title">标题</label>
+          <input class="control" id="f-title" name="title" placeholder="留空使用名称" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="f-branch">分支</label>
+          <input class="control" id="f-branch" name="branch" placeholder="留空使用默认分支" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="f-root">文档根</label>
+          <input class="control" id="f-root" name="root" placeholder="如 docs，留空自动探测" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label id="f-provider-label">平台</label>
+          <div class="select" data-select>
+            <input type="hidden" name="provider" value="">
+            <button class="control select-trigger" type="button" role="combobox" aria-labelledby="f-provider-label" aria-haspopup="listbox" aria-expanded="false">
+              <span>按域名自动识别</span><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="select-list" role="listbox" aria-labelledby="f-provider-label" hidden>
+              <li role="option" data-value="" aria-selected="true">按域名自动识别</li>
+              {{range .Providers}}<li role="option" data-value="{{.}}" aria-selected="false">{{providerName .}}</li>{{end}}
+            </ul>
+          </div>
+        </div>
+        <div class="field span-2">
+          <label id="f-cred-label">凭据</label>
+          <div class="select" data-select>
+            <input type="hidden" name="credential" value="">
+            <button class="control select-trigger" type="button" role="combobox" aria-labelledby="f-cred-label" aria-haspopup="listbox" aria-expanded="false">
+              <span>无（公开仓库）</span><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <ul class="select-list" role="listbox" aria-labelledby="f-cred-label" hidden>
+              <li role="option" data-value="" aria-selected="true">无（公开仓库）</li>
+              {{range .Credentials}}<li role="option" data-value="{{.}}" aria-selected="false">{{.}}</li>{{end}}
+            </ul>
+          </div>
+          <p class="field-hint">私有仓库需在配置文件 <code>credentials</code> 中定义令牌或 SSH 密钥{{if not .Credentials}}，当前未配置{{end}}。</p>
+        </div>
+      </div>
+      <p class="field-error form-error" hidden></p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" data-close>取消</button>
+        <button class="btn" type="submit">保存并同步</button>
+      </div>
+    </form>
+  </dialog>
+  {{end}}
+</main>
+{{end}}

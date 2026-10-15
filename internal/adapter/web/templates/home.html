@@ -1,0 +1,32 @@
+{{define "content"}}
+<main class="container">
+  {{range .}}
+  <section class="namespace">
+    <h2><a href="/docs/{{.Name}}/">{{.Title}}</a></h2>
+    {{if .Description}}<p class="muted">{{.Description}}</p>{{end}}
+    <div class="cards">
+      {{range .Trees}}
+      <a class="card" href="{{.URL}}">
+        <div class="card-title">{{.Title}}</div>
+        {{if .Description}}<p class="card-desc">{{.Description}}</p>{{end}}
+        <div class="card-meta">
+          {{if .Synced}}
+            <span>{{.Docs}} 篇文档</span>
+            {{if .Commit}}<span class="mono">{{short .Commit}}</span>{{end}}
+            <span>{{ago .BuiltAt}}更新</span>
+          {{else}}
+            <span class="badge badge-warn">未同步</span>
+          {{end}}
+          {{if .Running}}<span class="badge badge-info">同步中</span>{{end}}
+          {{if eq .LastStatus "failed"}}<span class="badge badge-err" title="{{.LastError}}">上次同步失败</span>{{end}}
+        </div>
+      </a>
+      {{end}}
+    </div>
+  </section>
+  {{else}}
+  <p class="muted">尚未配置任何文档。</p>
+  {{end}}
+  <p class="muted small home-ai">给 AI 使用：<a href="/llms.txt" target="_blank" rel="noopener">/llms.txt</a> 列出全部文档的 markdown 原文地址，更多方式（检索 API、MCP、RAG 切片）见 <a href="/ai">AI 接入</a>。</p>
+</main>
+{{end}}

@@ -1,0 +1,77 @@
+{{define "navlist"}}
+<ul>
+  {{range .}}
+  <li>
+    {{if .Children}}
+    <details{{if .Open}} open{{end}}>
+      <summary>{{if .URL}}<a href="{{.URL}}"{{if .Active}} class="active" aria-current="page"{{end}}>{{.Title}}</a>{{else}}<span>{{.Title}}</span>{{end}}</summary>
+      {{template "navlist" .Children}}
+    </details>
+    {{else if .URL}}
+    <a href="{{.URL}}"{{if .Active}} class="active" aria-current="page"{{end}}>{{.Title}}</a>
+    {{else}}
+    <span class="muted">{{.Title}}</span>
+    {{end}}
+  </li>
+  {{end}}
+</ul>
+{{end}}
+
+{{define "content"}}
+<div class="doc-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="ns-link" href="/docs/{{.NS.Name}}/">{{.NS.Title}}</a>
+      <a class="tree-title" href="{{.Tree.URL}}">{{.Tree.Title}}</a>
+      {{if .Trees}}
+      <details class="tree-switch">
+        <summary>切换文档树</summary>
+        <ul>{{range .Trees}}<li><a href="{{.URL}}">{{.Title}}</a></li>{{end}}</ul>
+      </details>
+      {{end}}
+    </div>
+    <nav class="nav-tree" aria-label="文档目录">{{template "navlist" .Nav}}</nav>
+    <div class="sidebar-foot muted">
+      {{if .Snapshot.Revision.Commit}}<span class="mono" title="{{.Snapshot.Revision.Message}}">{{short .Snapshot.Revision.Commit}}</span> · {{end}}
+      <a href="/status/{{.NS.Name}}/{{.Tree.Name}}">{{ago .Snapshot.BuiltAt}}同步</a>
+    </div>
+  </aside>
+
+  <main class="doc-main">
+    {{if .Pinned}}
+    <div class="markdown-alert markdown-alert-warning version-banner">
+      正在浏览历史版本 <span class="mono">{{.Snapshot.Version}}</span>。<a href="{{.LatestURL}}">查看最新版本</a>
+    </div>
+    {{end}}
+    {{if .Crumbs}}
+    <nav class="crumbs" aria-label="路径">
+      {{range .Crumbs}}{{if .URL}}<a href="{{.URL}}">{{.Title}}</a>{{else}}<span>{{.Title}}</span>{{end}}<span class="sep">/</span>{{end}}
+    </nav>
+    {{end}}
+    <article class="markdown-body">{{.HTML}}</article>
+    <footer class="doc-foot">
+      <div class="doc-meta muted">
+        <span class="mono">{{.Doc.Path}}</span>
+        · <a href="{{.RawURL}}" type="text/markdown" target="_blank" rel="noopener">Markdown 原文</a>
+        · <button class="link-btn" type="button" data-copy-url="{{.RawURL}}" hidden>复制 Markdown</button>
+        {{if .SourceURL}} · <a href="{{.SourceURL}}" target="_blank" rel="noopener">查看源文件</a>{{end}}
+      </div>
+      {{if or .Prev .Next}}
+      <nav class="pager">
+        {{with .Prev}}<a class="prev" href="{{.URL}}"><small>上一篇</small><span>{{.Title}}</span></a>{{else}}<span></span>{{end}}
+        {{with .Next}}<a class="next" href="{{.URL}}"><small>下一篇</small><span>{{.Title}}</span></a>{{end}}
+      </nav>
+      {{end}}
+    </footer>
+  </main>
+
+  {{if .TOC}}
+  <aside class="toc" aria-label="本页目录">
+    <div class="toc-title">本页目录</div>
+    <ul>
+      {{range .TOC}}<li class="lv{{.Level}}"><a href="#{{.ID}}">{{.Text}}</a></li>{{end}}
+    </ul>
+  </aside>
+  {{end}}
+</div>
+{{end}}

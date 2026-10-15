@@ -1,0 +1,70 @@
+{{define "content"}}
+<main class="container">
+  <div class="page-head">
+    <div>
+      <div class="muted small"><a href="/status">同步状态</a> / {{.Tree.Namespace}}</div>
+      <h1>{{.Tree.Title}}</h1>
+    </div>
+    <div class="actions">
+      {{if .Removable}}<button class="btn btn-ghost btn-danger-text" type="button" data-remove-tree="{{.Tree.Namespace}}/{{.Tree.Name}}" data-auth>删除</button>{{end}}
+      {{if .Tree.Synced}}<a class="btn btn-secondary" href="{{.Tree.URL}}">浏览文档</a>{{end}}
+      <button class="btn btn-ghost" type="button" data-sync="{{.Tree.Namespace}}/{{.Tree.Name}}" data-confirm="强制重建会忽略提交未变化的判断，重新解析整棵文档树并生成新版本。" data-force{{if .AuthNeeded}} data-auth{{end}}>强制重建</button>
+      <button class="btn" type="button" data-sync="{{.Tree.Namespace}}/{{.Tree.Name}}"{{if .AuthNeeded}} data-auth{{end}}>立即同步</button>
+    </div>
+  </div>
+
+  <dl class="kv">
+    <dt>来源</dt><dd class="mono break">{{.Tree.Source}}</dd>
+    {{with .Tree.Provider}}<dt>平台</dt><dd>{{providerTitle .}}</dd>{{end}}
+    <dt>分支</dt><dd>{{if .Tree.Branch}}{{.Tree.Branch}}{{else}}默认分支{{end}}</dd>
+    <dt>文档根</dt><dd class="mono">{{if .Tree.Root}}{{.Tree.Root}}{{else}}自动探测{{end}}</dd>
+    {{with .Spec.Filter.Include}}<dt>包含</dt><dd class="mono">{{range .}}{{.}} {{end}}</dd>{{end}}
+    {{with .Spec.Filter.Exclude}}<dt>排除</dt><dd class="mono">{{range .}}{{.}} {{end}}</dd>{{end}}
+    <dt>定时同步</dt><dd>{{if .Tree.Interval}}每 {{.Tree.Interval}}{{else}}关闭{{end}}</dd>
+    <dt>当前版本</dt><dd class="mono">{{if .Current}}{{.Current}}{{else}}-{{end}}</dd>
+    <dt>文档数</dt><dd>{{.Tree.Docs}}</dd>
+    <dt>Webhook</dt><dd class="mono break small">{{.Webhook}}</dd>
+  </dl>
+
+  <h2>同步记录</h2>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>开始时间</th><th>触发</th><th>状态</th><th>提交</th><th>变更</th><th>耗时</th><th>版本</th></tr></thead>
+    <tbody>
+    {{range .Runs}}
+    <tr>
+      <td title="{{datetime .StartedAt}}">{{ago .StartedAt}}</td>
+      <td>{{.Trigger}}{{if .Force}} <span class="muted">(force)</span>{{end}}</td>
+      <td>
+        {{if eq .Status "failed"}}<span class="badge badge-err">failed</span>
+        {{else if eq .Status "running"}}<span class="badge badge-info">running</span>
+        {{else if eq .Status "unchanged"}}<span class="badge">unchanged</span>
+        {{else}}<span class="badge badge-ok">{{.Status}}</span>{{end}}
+      </td>
+      <td class="mono" title="{{.Revision.Message}}">{{if .Revision.Commit}}{{short .Revision.Commit}}{{else}}-{{end}}</td>
+      <td class="mono small">{{if eq .Status "success"}}{{changeStr .Changes}}{{else}}-{{end}}</td>
+      <td class="small">{{duration .}}</td>
+      <td class="mono small">{{.Version}}</td>
+    </tr>
+    {{if or .Error .HookErrors}}
+    <tr class="run-error"><td colspan="7">
+      {{if .Error}}<pre>{{.Error}}</pre>{{end}}
+      {{range .HookErrors}}<pre>hook {{.}}</pre>{{end}}
+    </td></tr>
+    {{end}}
+    {{else}}
+    <tr><td colspan="7" class="muted">暂无同步记录</td></tr>
+    {{end}}
+    </tbody>
+  </table>
+  </div>
+
+  {{if .Versions}}
+  <h2>历史版本</h2>
+  <ul class="versions">
+    {{$cur := .Current}}{{$url := .Tree.URL}}
+    {{range .Versions}}<li><a class="mono" href="{{$url}}?v={{.}}">{{.}}</a>{{if eq . $cur}} <span class="badge badge-ok">当前</span>{{end}}</li>{{end}}
+  </ul>
+  {{end}}
+</main>
+{{end}}

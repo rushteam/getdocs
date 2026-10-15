@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/application/catalog"
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/application/catalog"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // treeView 是文档树对外展示的信息，不包含凭据等敏感配置。

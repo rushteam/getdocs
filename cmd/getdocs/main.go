@@ -21,9 +21,9 @@ import (
 	"github.com/rushteam/beauty/pkg/foundation/buildinfo"
 	blog "github.com/rushteam/beauty/pkg/service/logger"
 
-	"getdocs/internal/bootstrap"
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/config"
+	"github.com/rushteam/getdocs/internal/bootstrap"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/config"
 )
 
 func main() {

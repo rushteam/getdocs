@@ -8,7 +8,7 @@ import (
 	east "github.com/yuin/goldmark/extension/ast"
 	"golang.org/x/net/html"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // extractSections 按标题把文档切分为章节，并返回标题列表。

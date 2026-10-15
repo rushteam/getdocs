@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/config"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/config"
 )
 
 func newTestApp(t *testing.T, addr string) *App {

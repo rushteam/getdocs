@@ -15,7 +15,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Config 是服务配置根。

@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Options 是同步行为配置。

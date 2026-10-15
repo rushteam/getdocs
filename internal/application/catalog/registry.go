@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // LoadRegistry 加载登记的文档树并合并到配置的文档树中，应在 Restore 之前调用；可重复调用以加载新登记项。

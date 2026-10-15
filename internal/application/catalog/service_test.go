@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 var key = docs.TreeKey{Namespace: "team", Tree: "api"}

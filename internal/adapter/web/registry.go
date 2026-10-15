@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // canRegister 判断是否开放页面登记：必须配置管理令牌，否则任何人都能让服务拉取任意仓库。

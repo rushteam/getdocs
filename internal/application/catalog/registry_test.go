@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 type memRegistry struct {

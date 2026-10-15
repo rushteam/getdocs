@@ -1,4 +1,4 @@
-module getdocs
+module github.com/rushteam/getdocs
 
 go 1.26.2
 

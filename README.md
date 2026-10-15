@@ -12,10 +12,12 @@ GetDocs 从多个 git 代码仓库同步 markdown 文档，按 **命名空间 �
 ## 快速开始
 
 ```sh
-go build -o getdocs ./cmd/getdocs
+go install github.com/rushteam/getdocs/cmd/getdocs@latest
 cp config.example.yaml getdocs.yaml   # 按需修改 namespaces
-./getdocs serve                       # http://localhost:8080
+getdocs serve                         # http://localhost:8080
 ```
+
+也可以克隆仓库后用 `make build` 构建，产物在 `bin/getdocs`。
 
 运行依赖系统中的 `git`（≥ 2.27，需要 `sparse-checkout` 与 `--filter`）。
 
@@ -391,3 +393,7 @@ docker run -p 8080:8080 -v $PWD/getdocs.yaml:/etc/getdocs/getdocs.yaml:ro -v get
   - 对话框由 `ask({mode: "alert" | "confirm" | "prompt", ...})` 创建，返回 Promise。
   - 按钮加上 `data-confirm="说明"` 后，点击会先弹出确认框。
 - `fonts/`：自托管的 Geist 字体。页面的 CSP 不允许加载外部字体，所以字体随二进制一起分发，许可证见 `Geist-OFL.txt`（SIL OFL 1.1）。
+
+## 许可证
+
+[MIT](LICENSE)

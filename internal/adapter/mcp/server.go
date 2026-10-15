@@ -11,8 +11,8 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"getdocs/internal/application/catalog"
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/application/catalog"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 const instructions = `This server hosts documentation synced from git repositories, organized as namespace → tree → document.

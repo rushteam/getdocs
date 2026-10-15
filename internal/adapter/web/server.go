@@ -18,9 +18,9 @@ import (
 	"strings"
 	texttemplate "text/template"
 
-	"getdocs/internal/application/catalog"
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/application/catalog"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 //go:embed templates/*.html templates/*.md static/*

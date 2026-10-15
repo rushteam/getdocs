@@ -1,8 +1,8 @@
 package protodoc
 
 import (
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 // Parser 按文件类型分派：.proto 文件先转换为接口文档 markdown 再解析，其余交给 markdown 引擎。

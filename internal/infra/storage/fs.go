@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // FS 实现 docs.SnapshotStore 与 docs.StateStore。

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // localCheckout 直接读取本地目录，适用于本地开发预览或挂载进容器的文档。

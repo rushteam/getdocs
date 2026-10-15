@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // page 是所有页面模板的公共数据。

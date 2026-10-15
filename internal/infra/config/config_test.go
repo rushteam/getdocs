@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 func writeConfig(t *testing.T, content string) string {

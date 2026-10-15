@@ -19,7 +19,7 @@ import (
 
 	"github.com/rushteam/beauty/pkg/resilience/backoff"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Payload 是导出与推送的数据格式。

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"slices"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Namespaces 返回全部命名空间。返回的是副本，文档树增删不影响调用方持有的结果。

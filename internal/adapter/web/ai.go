@@ -12,8 +12,8 @@ import (
 	"strings"
 	texttemplate "text/template"
 
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 // 面向 AI 与开发者的入口：/llms.txt、/llms-full.txt、/ai（接入说明）与 /ai.md（其 markdown 版本）。

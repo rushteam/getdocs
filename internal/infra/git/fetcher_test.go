@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 func run(t *testing.T, dir string, args ...string) string {

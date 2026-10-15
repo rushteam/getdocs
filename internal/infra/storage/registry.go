@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // FileRegistry 把登记的文档树保存在单个 JSON 文件中，实现 docs.TreeRegistry。

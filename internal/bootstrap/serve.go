@@ -23,8 +23,8 @@ import (
 	"github.com/rushteam/beauty/pkg/service/webserver"
 	"go.opentelemetry.io/otel/attribute"
 
-	"getdocs/internal/adapter/web"
-	"getdocs/internal/application/catalog"
+	"github.com/rushteam/getdocs/internal/adapter/web"
+	"github.com/rushteam/getdocs/internal/application/catalog"
 )
 
 const (

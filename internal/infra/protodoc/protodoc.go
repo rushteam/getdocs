@@ -19,7 +19,7 @@ import (
 	"google.golang.org/protobuf/types/descriptorpb"
 	"gopkg.in/yaml.v3"
 
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 // descriptor.proto 中的字段编号，用于定位源码注释。

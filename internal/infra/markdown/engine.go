@@ -21,7 +21,7 @@ import (
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Engine 实现 docs.Parser，并提供 HTML 渲染，可并发使用。

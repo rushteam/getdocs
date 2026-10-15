@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 func TestTokenize(t *testing.T) {

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 func convertFixture(t *testing.T) string {

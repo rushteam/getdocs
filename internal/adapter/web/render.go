@@ -4,8 +4,8 @@ import (
 	"strings"
 	"sync"
 
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
 )
 
 // renderCache 缓存渲染结果。快照不可变，版本号 + 路径即可唯一确定渲染输出。

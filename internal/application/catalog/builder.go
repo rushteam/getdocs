@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // maxAssetSize 是单个资源文件的收录上限，超过则不随快照保存。

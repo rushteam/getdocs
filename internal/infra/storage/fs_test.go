@@ -9,7 +9,7 @@ import (
 	"slices"
 	"testing"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 var key = docs.TreeKey{Namespace: "ns", Tree: "t"}

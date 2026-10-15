@@ -23,7 +23,7 @@ import (
 	"sync"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Fetcher 实现 docs.Fetcher，为每个“仓库地址 + 分支”维护一份缓存工作副本。

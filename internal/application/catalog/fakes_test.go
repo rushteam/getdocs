@@ -12,7 +12,7 @@ import (
 	"strings"
 	"sync"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 var discard = slog.New(slog.NewTextHandler(io.Discard, nil))

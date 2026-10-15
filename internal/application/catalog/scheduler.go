@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/domain/docs"
 )
 
 // Scheduler 按文档树各自的间隔定时同步。

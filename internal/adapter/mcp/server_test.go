@@ -11,12 +11,12 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"getdocs/internal/application/catalog"
-	"getdocs/internal/application/search"
-	"getdocs/internal/domain/docs"
-	"getdocs/internal/infra/git"
-	"getdocs/internal/infra/markdown"
-	"getdocs/internal/infra/storage"
+	"github.com/rushteam/getdocs/internal/application/catalog"
+	"github.com/rushteam/getdocs/internal/application/search"
+	"github.com/rushteam/getdocs/internal/domain/docs"
+	"github.com/rushteam/getdocs/internal/infra/git"
+	"github.com/rushteam/getdocs/internal/infra/markdown"
+	"github.com/rushteam/getdocs/internal/infra/storage"
 )
 
 func TestExtractSection(t *testing.T) {
